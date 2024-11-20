@@ -1,6 +1,7 @@
 package twitter.simplificado.springsecurity.controller;
 
 import java.time.Instant;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import twitter.simplificado.springsecurity.controller.dto.LoginRequest;
 import twitter.simplificado.springsecurity.controller.dto.LoginResponse;
+import twitter.simplificado.springsecurity.entities.Role;
 import twitter.simplificado.springsecurity.repository.UserRepository;
 
 @RestController
@@ -45,11 +47,17 @@ public class TokenController {
 			var now = Instant.now();
 			var expiresIn = 300L;
 			
+			var scopes = user.get().getRoles()
+					.stream()
+					.map(Role::getName)
+					.collect(Collectors.joining(" "));
+			
 			var claims = JwtClaimsSet.builder()
 					.issuer("mybackend")
 					.subject(user.get().getUserId().toString())
 					.issuedAt(now)
 					.expiresAt(now.plusSeconds(expiresIn))
+					.claim("scope", scopes)
 					.build();
 			
 			var jwtValue = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();

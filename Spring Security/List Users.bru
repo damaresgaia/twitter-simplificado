@@ -1,0 +1,18 @@
+meta {
+  name: List Users
+  type: http
+  seq: 4
+}
+
+post {
+  url: http://localhost:8080/users
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username": "bruno",
+    "password": "123"
+  }
+}
